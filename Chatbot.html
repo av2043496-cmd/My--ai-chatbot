@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ANAND AI Lab - Futuristic AI Chat Website built with HTML, CSS and JavaScript">
+<title>ANAND AI Lab | AI Chat</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#050816;
+    --panel:rgba(13,20,42,.72);
+    --panel2:rgba(20,29,58,.72);
+    --border:rgba(120,160,255,.18);
+    --primary:#6c63ff;
+    --secondary:#00e5ff;
+    --text:#f5f7ff;
+    --muted:#8f9ab8;
+    --success:#39ff9c;
+    --danger:#ff5577;
+    --shadow:0 20px 70px rgba(0,0,0,.45);
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:
+        radial-gradient(circle at 15% 15%,rgba(108,99,255,.18),transparent 30%),
+        radial-gradient(circle at 85% 80%,rgba(0,229,255,.12),transparent 30%),
+        var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+}
+
+/* Background particles */
+body::before,
+body::after{
+    content:"";
+    position:fixed;
+    width:280px;
+    height:280px;
+    border-radius:50%;
+    filter:blur(100px);
+    pointer-events:none;
+    z-index:-1;
+}
+
+body::before{
+    background:rgba(108,99,255,.16);
+    top:-100px;
+    left:-100px;
+}
+
+body::after{
+    background:rgba(0,229,255,.10);
+    bottom:-100px;
+    right:-100px;
+}
+
+/* APP */
+.app{
+    width:min(1180px,94%);
+    min-height:100vh;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+}
+
+/* HEADER */
+header{
+    height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--border);
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    display:grid;
+    place-items:center;
+    font-size:21px;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    box-shadow:0 0 30px rgba(108,99,255,.35);
+}
+
+.brand-text h1{
+    font-size:18px;
+    letter-spacing:.5px;
+}
+
+.brand-text span{
+    color:var(--secondary);
+    font-size:11px;
+    letter-spacing:2px;
+}
+
+.header-actions{
+    display:flex;
+    gap:8px;
+}
+
+.icon-btn{
+    width:40px;
+    height:40px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    cursor:pointer;
+    transition:.2s;
+}
+
+.icon-btn:hover{
+    transform:translateY(-2px);
+    border-color:rgba(0,229,255,.45);
+    background:rgba(0,229,255,.08);
+}
+
+/* MAIN */
+main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:25px 0 20px;
+}
+
+.chat-area{
+    flex:1;
+    min-height:470px;
+    max-height:calc(100vh - 210px);
+    overflow-y:auto;
+    padding:10px 8px 20px;
+}
+
+/* Scrollbar */
+.chat-area::-webkit-scrollbar{
+    width:6px;
+}
+
+.chat-area::-webkit-scrollbar-thumb{
+    background:rgba(108,99,255,.35);
+    border-radius:20px;
+}
+
+/* WELCOME */
+.welcome{
+    min-height:450px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.welcome-content{
+    max-width:650px;
+}
+
+.ai-orb{
+    width:100px;
+    height:100px;
+    margin:0 auto 25px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-size:42px;
+    background:
+        radial-gradient(circle at 35% 30%,#fff,transparent 8%),
+        linear-gradient(135deg,#6c63ff,#00e5ff);
+    box-shadow:
+        0 0 30px rgba(108,99,255,.5),
+        0 0 90px rgba(0,229,255,.2);
+    animation:orb 3s ease-in-out infinite;
+}
+
+@keyframes orb{
+    0%,100%{
+        transform:translateY(0) scale(1);
+    }
+    50%{
+        transform:translateY(-8px) scale(1.04);
+    }
+}
+
+.welcome h2{
+    font-size:clamp(30px,6vw,55px);
+    margin-bottom:12px;
+    background:linear-gradient(90deg,#fff,#aeb9ff,#7df7ff);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+}
+
+.welcome p{
+    color:var(--muted);
+    line-height:1.7;
+    max-width:560px;
+    margin:auto;
+}
+
+/* SUGGESTIONS */
+.suggestions{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin-top:28px;
+}
+
+.suggestion{
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.035);
+    color:#dfe5ff;
+    padding:11px 15px;
+    border-radius:30px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.suggestion:hover{
+    background:rgba(108,99,255,.15);
+    border-color:rgba(108,99,255,.5);
+    transform:translateY(-2px);
+}
+
+/* MESSAGES */
+.message{
+    display:flex;
+    gap:12px;
+    margin:18px auto;
+    width:min(900px,100%);
+}
+
+.message.user{
+    justify-content:flex-end;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+    flex:0 0 38px;
+    border-radius:12px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,var(--primary),#8f87ff);
+    box-shadow:0 0 20px rgba(108,99,255,.25);
+}
+
+.message.ai .avatar{
+    background:linear-gradient(135deg,#00bcd4,#6c63ff);
+}
+
+.bubble{
+    max-width:min(720px,78%);
+    padding:14px 17px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    background:var(--panel);
+    box-shadow:0 8px 30px rgba(0,0,0,.16);
+    line-height:1.65;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.message.user .bubble{
+    background:linear-gradient(
+        135deg,
+        rgba(108,99,255,.32),
+        rgba(73,70,180,.2)
+    );
+    border-color:rgba(108,99,255,.35);
+    border-bottom-right-radius:5px;
+}
+
+.message.ai .bubble{
+    border-bottom-left-radius:5px;
+}
+
+.time{
+    display:block;
+    color:#6f7b9a;
+    font-size:10px;
+    margin-top:7px;
+}
+
+/* TYPING */
+.typing{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    height:20px;
+}
+
+.typing span{
+    width:6px;
+    height:6px;
+    background:var(--secondary);
+    border-radius:50%;
+    animation:typing .9s infinite;
+}
+
+.typing span:nth-child(2){
+    animation-delay:.15s;
+}
+
+.typing span:nth-child(3){
+    animation-delay:.3s;
+}
+
+@keyframes typing{
+    0%,60%,100%{
+        transform:translateY(0);
+        opacity:.35;
+    }
+    30%{
+        transform:translateY(-5px);
+        opacity:1;
+    }
+}
+
+/* INPUT AREA */
+.input-wrap{
+    width:min(900px,100%);
+    margin:0 auto;
+}
+
+.input-box{
+    display:flex;
+    align-items:flex-end;
+    gap:10px;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:20px;
+    background:rgba(10,16,35,.88);
+    backdrop-filter:blur(20px);
+    box-shadow:var(--shadow);
+}
+
+#messageInput{
+    flex:1;
+    min-height:46px;
+    max-height:130px;
+    resize:none;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:var(--text);
+    font:inherit;
+    padding:13px 10px;
+}
+
+#messageInput::placeholder{
+    color:#687390;
+}
+
+.send-btn{
+    width:48px;
+    height:48px;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    color:white;
+    font-size:18px;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    box-shadow:0 0 25px rgba(108,99,255,.25);
+    transition:.2s;
+}
+
+.send-btn:hover{
+    transform:scale(1.05);
+}
+
+.send-btn:active{
+    transform:scale(.95);
+}
+
+.input-note{
+    text-align:center;
+    color:#697591;
+    font-size:10px;
+    margin-top:9px;
+}
+
+/* FOOTER */
+footer{
+    padding:14px 0 20px;
+    text-align:center;
+    color:#66718d;
+    font-size:11px;
+}
+
+footer strong{
+    color:#9da8c5;
+}
+
+/* HIDDEN */
+.hidden{
+    display:none !important;
+}
+
+/* MOBILE */
+@media(max-width:650px){
+
+    .app{
+        width:94%;
+    }
+
+    header{
+        height:68px;
+    }
+
+    .brand-text h1{
+        font-size:15px;
+    }
+
+    .brand-text span{
+        font-size:9px;
+    }
+
+    .logo{
+        width:38px;
+        height:38px;
+        border-radius:12px;
+    }
+
+    .chat-area{
+        min-height:420px;
+        max-height:none;
+    }
+
+    .welcome{
+        min-height:410px;
+    }
+
+    .welcome h2{
+        font-size:34px;
+    }
+
+    .welcome p{
+        font-size:13px;
+    }
+
+    .suggestions{
+        gap:7px;
+    }
+
+    .suggestion{
+        font-size:12px;
+        padding:9px 11px;
+    }
+
+    .bubble{
+        max-width:82%;
+        font-size:13px;
+    }
+
+    .avatar{
+        width:34px;
+        height:34px;
+        flex-basis:34px;
+    }
+
+    main{
+        padding-top:10px;
+    }
+}
+
+/* REDUCED MOTION */
+@media(prefers-reduced-motion:reduce){
+    *,
+    *::before,
+    *::after{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        scroll-behavior:auto !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header>
+
+        <div class="brand">
+            <div class="logo">🤖</div>
+
+            <div class="brand-text">
+                <h1>ANAND AI Lab</h1>
+                <span>SMART • FAST • CREATIVE</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+
+            <button
+                class="icon-btn"
+                id="newChatBtn"
+                title="New Chat"
+                aria-label="New Chat">
+                ＋
+            </button>
+
+            <button
+                class="icon-btn"
+                id="clearBtn"
+                title="Clear Chat"
+                aria-label="Clear Chat">
+                🗑
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <section
+            class="chat-area"
+            id="chatArea"
+            aria-live="polite">
+
+            <div
+                class="welcome"
+                id="welcome">
+
+                <div class="welcome-content">
+
+                    <div class="ai-orb">
+                        🤖
+                    </div>
+
+                    <h2>How can I help?</h2>
+
+                    <p>
+                        Welcome to ANAND AI Lab.
+                        Ask me anything about coding,
+                        websites, JavaScript or creative
+                        project ideas.
+                    </p>
+
+                    <div class="suggestions">
+
+                        <button class="suggestion">
+                            Explain HTML
+                        </button>
+
+                        <button class="suggestion">
+                            Give me a website idea
+                        </button>
+
+                        <button class="suggestion">
+                            Teach me JavaScript
+                        </button>
+
+                        <button class="suggestion">
+                            Create a coding challenge
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="input-wrap">
+
+            <div class="input-box">
+
+                <textarea
+                    id="messageInput"
+                    rows="1"
+                    maxlength="1000"
+                    placeholder="Message ANAND AI..."
+                    aria-label="Message ANAND AI"></textarea>
+
+                <button
+                    class="send-btn"
+                    id="sendBtn"
+                    aria-label="Send message">
+                    ➤
+                </button>
+
+            </div>
+
+            <div class="input-note">
+                ANAND AI Lab • HTML + CSS + JavaScript
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+        Built with <strong>HTML • CSS • JavaScript</strong>
+        by <strong>ANAND CODE LAB</strong> 🚀
+    </footer>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const chatArea = document.getElementById("chatArea");
+    const welcome = document.getElementById("welcome");
+    const input = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const newChatBtn = document.getElementById("newChatBtn");
+    const suggestions = document.querySelectorAll(".suggestion");
+
+    const STORAGE_KEY = "anand_ai_chat";
+
+    /*
+    ============================================
+    LOCAL AI RESPONSE ENGINE
+    ============================================
+    */
+
+    const responses = [
+
+        {
+            keywords: ["hello", "hi", "hey", "namaste"],
+            answer:
+`Hello! 👋
+
+I'm ANAND AI Lab 🤖
+
+I can help you with:
+• HTML
+• CSS
+• JavaScript
+• Website ideas
+• Coding challenges
+
+What are you building today? 🚀`
+        },
+
+        {
+            keywords: ["html"],
+            answer:
+`HTML is the structure of a website. 🧱
+
+Think of it like the skeleton of a webpage.
+
+For example:
+
+<h1>Hello World</h1>
+<p>My first website</p>
+
+HTML defines the content and structure, while CSS controls the design and JavaScript adds interaction. 💻`
+        },
+
+        {
+            keywords: ["css", "design", "style"],
+            answer:
+`CSS controls how a website looks. 🎨
+
+You can use CSS for:
+
+• Colors
+• Fonts
+• Layouts
+• Animations
+• Responsive design
+• Glassmorphism
+• Neon effects
+
+HTML = Structure
+CSS = Design
+JavaScript = Interaction ⚡`
+        },
+
+        {
+            keywords: ["javascript", "js"],
+            answer:
+`JavaScript makes websites interactive. ⚡
+
+You can use it to:
+
+• Handle button clicks
+• Change HTML
+• Create games
+• Build calculators
+• Create animations
+• Store data
+• Build interactive web apps
+
+A simple example:
+
+const button = document.querySelector("button");
+
+button.addEventListener("click", () => {
+    alert("Hello!");
+});`
+        },
+
+        {
+            keywords: ["website idea", "web idea", "project idea"],
+            answer:
+`Here are some project ideas you can build:
+
+🚀 1. AI Chat Website
+🎮 2. Browser Game
+🌦️ 3. Weather App
+📝 4. Notes App
+💰 5. Expense Tracker
+🎵 6. Music Player UI
+📚 7. Study Planner
+🔐 8. Login Dashboard
+
+Pick one and turn the idea into a real project! 🔥`
+        },
+
+        {
+            keywords: ["game", "gaming"],
+            answer:
+`Try building a browser game! 🎮
+
+Good beginner projects:
+
+• Snake
+• Memory Match
+• 2048
+• Runner
+• Dodge Game
+• Quiz Game
+
+Use HTML for structure,
+CSS for the interface,
+and JavaScript for gameplay logic. 🚀`
+        },
+
+        {
+            keywords: ["coding challenge", "challenge"],
+            answer:
+`🔥 CODING CHALLENGE:
+
+Build a button that changes the page background every time you click it.
+
+Rules:
+
+1. Use HTML for the button.
+2. Use CSS for styling.
+3. Use JavaScript for the interaction.
+4. Don't use any external library.
+
+Think you can build it? 😈`
+        },
+
+        {
+            keywords: ["portfolio"],
+            answer:
+`A good developer portfolio can contain:
+
+👤 About Me
+💻 Skills
+🚀 Projects
+🎯 Experience
+📱 Contact
+🔗 GitHub
+
+Tip: Don't just show screenshots.
+
+Give people a LIVE DEMO so they can actually try your projects. 🔥`
+        },
+
+        {
+            keywords: ["github"],
+            answer:
+`GitHub is great for storing and sharing your code. 💻
+
+A simple workflow:
+
+CODE → GITHUB → GITHUB PAGES → LIVE WEBSITE 🚀
+
+For frontend projects, you can host HTML, CSS and JavaScript projects as live websites using GitHub Pages.`
+        },
+
+        {
+            keywords: ["help"],
+            answer:
+`Sure! 🤖
+
+Try asking me:
+
+“Explain HTML”
+“Teach me JavaScript”
+“Give me a website idea”
+“Give me a coding challenge”
+“How do I make a game?”
+“How do I make a portfolio?”
+
+Let's build something! 🚀`
+        }
+
+    ];
+
+
+    /*
+    ============================================
+    GET RESPONSE
+    ============================================
+    */
+
+    function getResponse(message){
+
+        const text = message.toLowerCase();
+
+        for(const item of responses){
+
+            const found = item.keywords.some(keyword =>
+                text.includes(keyword)
+            );
+
+            if(found){
+                return item.answer;
+            }
+        }
+
+        return `Interesting question! 🤔
+
+I'm currently running in DEMO MODE, so my knowledge is based on a set of local responses.
+
+Try asking me about:
+
+💻 HTML
+🎨 CSS
+⚡ JavaScript
+🎮 Games
+🌐 Website ideas
+🚀 Coding challenges
+
+For a real AI version, this interface could later be connected to an AI API.`;
+    }
+
+
+    /*
+    ============================================
+    TIME
+    ============================================
+    */
+
+    function getTime(){
+
+        return new Date().toLocaleTimeString([], {
+            hour:"2-digit",
+            minute:"2-digit"
+        });
+
+    }
+
+
+    /*
+    ============================================
+    ESCAPE HTML
+    ============================================
+    */
+
+    function escapeHTML(text){
+
+        const div = document.createElement("div");
+
+        div.textContent = text;
+
+        return div.innerHTML;
+    }
+
+
+    /*
+    ============================================
+    ADD MESSAGE
+    ============================================
+    */
+
+    function addMessage(text, type, save = true){
+
+        if(welcome){
+            welcome.remove();
+        }
+
+        const message = document.createElement("div");
+
+        message.className = `message ${type}`;
+
+        const avatar = document.createElement("div");
+
+        avatar.className = "avatar";
+
+        avatar.textContent =
+            type === "user" ? "👤" : "🤖";
+
+
+        const bubble = document.createElement("div");
+
+        bubble.className = "bubble";
+
+        bubble.innerHTML =
+            escapeHTML(text) +
+            `<span class="time">${getTime()}</span>`;
+
+
+        message.appendChild(avatar);
+        message.appendChild(bubble);
+
+        chatArea.appendChild(message);
+
+        scrollToBottom();
+
+
+        if(save){
+
+            saveMessage({
+                text,
+                type
+            });
+
+        }
+
+    }
+
+
+    /*
+    ============================================
+    TYPING INDICATOR
+    ============================================
+    */
+
+    function showTyping(){
+
+        const message = document.createElement("div");
+
+        message.className = "message ai";
+
+        message.id = "typingMessage";
+
+        const avatar = document.createElement("div");
+
+        avatar.className = "avatar";
+
+        avatar.textContent = "🤖";
+
+
+        const bubble = document.createElement("div");
+
+        bubble.className = "bubble";
+
+        bubble.innerHTML = `
+            <div class="typing">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+
+
+        message.appendChild(avatar);
+
+        message.appendChild(bubble);
+
+        chatArea.appendChild(message);
+
+        scrollToBottom();
+
+    }
+
+
+    /*
+    ============================================
+    REMOVE TYPING
+    ============================================
+    */
+
+    function removeTyping(){
+
+        const typing =
+            document.getElementById("typingMessage");
+
+        if(typing){
+            typing.remove();
+        }
+
+    }
+
+
+    /*
+    ============================================
+    SEND MESSAGE
+    ============================================
+    */
+
+    function sendMessage(){
+
+        const message = input.value.trim();
+
+        if(!message){
+            return;
+        }
+
+        addMessage(message, "user");
+
+        input.value = "";
+
+        input.style.height = "auto";
+
+        showTyping();
+
+
+        const delay =
+            700 + Math.floor(Math.random() * 900);
+
+
+        setTimeout(() => {
+
+            removeTyping();
+
+            const response =
+                getResponse(message);
+
+            addMessage(response, "ai");
+
+        }, delay);
+
+    }
+
+
+    /*
+    ============================================
+    SAVE CHAT
+    ============================================
+    */
+
+    function saveMessage(message){
+
+        try{
+
+            const history =
+                JSON.parse(
+                    localStorage.getItem(STORAGE_KEY) || "[]"
+                );
+
+            history.push(message);
+
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(history.slice(-50))
+            );
+
+        }catch(error){
+
+            console.log(
+                "Storage unavailable:",
+                error
+   
