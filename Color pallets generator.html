@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ANAND Color Lab - Interactive Color Palette Generator">
+<title>ANAND Color Lab | Palette Generator</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#050816;
+    --panel:rgba(15,22,45,.78);
+    --border:rgba(255,255,255,.12);
+    --text:#f7f9ff;
+    --muted:#8d98b5;
+    --accent:#00e5ff;
+    --purple:#7c5cff;
+    --green:#39ff9c;
+}
+
+body{
+    min-height:100vh;
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:var(--text);
+    background:
+        radial-gradient(circle at 10% 10%,rgba(124,92,255,.20),transparent 30%),
+        radial-gradient(circle at 90% 80%,rgba(0,229,255,.14),transparent 30%),
+        var(--bg);
+    overflow-x:hidden;
+}
+
+/* Background glow */
+body::before,
+body::after{
+    content:"";
+    position:fixed;
+    width:300px;
+    height:300px;
+    border-radius:50%;
+    filter:blur(110px);
+    pointer-events:none;
+    z-index:-1;
+}
+
+body::before{
+    background:rgba(124,92,255,.12);
+    top:-120px;
+    left:-100px;
+}
+
+body::after{
+    background:rgba(0,229,255,.10);
+    bottom:-120px;
+    right:-100px;
+}
+
+/* APP */
+.app{
+    width:min(1100px,94%);
+    min-height:100vh;
+    margin:auto;
+    padding:25px 0;
+}
+
+/* HEADER */
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo{
+    width:48px;
+    height:48px;
+    border-radius:15px;
+    display:grid;
+    place-items:center;
+    font-size:24px;
+    background:linear-gradient(
+        135deg,
+        var(--purple),
+        var(--accent)
+    );
+    box-shadow:0 0 35px rgba(0,229,255,.25);
+}
+
+.brand h1{
+    font-size:20px;
+}
+
+.brand span{
+    display:block;
+    margin-top:3px;
+    font-size:10px;
+    letter-spacing:2px;
+    color:var(--accent);
+}
+
+.header-badge{
+    padding:9px 14px;
+    border:1px solid var(--border);
+    border-radius:30px;
+    background:rgba(255,255,255,.04);
+    color:var(--muted);
+    font-size:11px;
+}
+
+/* HERO */
+.hero{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.hero h2{
+    font-size:clamp(35px,7vw,62px);
+    line-height:1;
+    margin-bottom:15px;
+    background:linear-gradient(
+        90deg,
+        #ffffff,
+        #aeb8ff,
+        #76f5ff
+    );
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+}
+
+.hero p{
+    color:var(--muted);
+    max-width:600px;
+    margin:auto;
+    line-height:1.6;
+}
+
+/* PALETTE */
+.palette{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:14px;
+    margin:35px auto;
+}
+
+.color-card{
+    min-height:360px;
+    position:relative;
+    overflow:hidden;
+    border-radius:25px;
+    border:1px solid rgba(255,255,255,.18);
+    background:#111;
+    box-shadow:0 20px 45px rgba(0,0,0,.25);
+    transition:.3s;
+}
+
+.color-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 25px 55px rgba(0,0,0,.4);
+}
+
+.color-preview{
+    position:absolute;
+    inset:0;
+    transition:.4s;
+}
+
+.color-content{
+    position:absolute;
+    left:12px;
+    right:12px;
+    bottom:12px;
+    padding:15px;
+    border-radius:18px;
+    background:rgba(0,0,0,.45);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.16);
+}
+
+.color-number{
+    font-size:10px;
+    color:rgba(255,255,255,.65);
+    margin-bottom:5px;
+    letter-spacing:1px;
+}
+
+.hex{
+    display:block;
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:1px;
+    margin-bottom:10px;
+}
+
+.card-actions{
+    display:flex;
+    gap:7px;
+}
+
+.small-btn{
+    flex:1;
+    padding:9px 5px;
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:10px;
+    background:rgba(255,255,255,.1);
+    color:white;
+    cursor:pointer;
+    font-size:11px;
+    transition:.2s;
+}
+
+.small-btn:hover{
+    background:rgba(255,255,255,.2);
+}
+
+.locked{
+    outline:2px solid var(--green);
+    outline-offset:-2px;
+}
+
+.lock-badge{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:rgba(0,0,0,.42);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.15);
+}
+
+/* CONTROLS */
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:25px 0;
+}
+
+.main-btn{
+    border:none;
+    padding:14px 24px;
+    border-radius:15px;
+    color:white;
+    font-weight:800;
+    cursor:pointer;
+    background:linear-gradient(
+        135deg,
+        var(--purple),
+        var(--accent)
+    );
+    box-shadow:0 12px 35px rgba(0,229,255,.15);
+    transition:.2s;
+}
+
+.main-btn:hover{
+    transform:translateY(-3px);
+}
+
+.main-btn:active{
+    transform:scale(.97);
+}
+
+.secondary-btn{
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border);
+    box-shadow:none;
+}
+
+/* TIP */
+.tip{
+    width:min(700px,100%);
+    margin:25px auto 0;
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.tip strong{
+    color:var(--green);
+}
+
+/* TOAST */
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:25px;
+    transform:translate(-50%,30px);
+    opacity:0;
+    pointer-events:none;
+    padding:12px 18px;
+    border-radius:30px;
+    background:rgba(10,15,30,.9);
+    border:1px solid rgba(57,255,156,.35);
+    color:var(--green);
+    backdrop-filter:blur(15px);
+    transition:.3s;
+    z-index:100;
+    font-size:13px;
+}
+
+.toast.show{
+    transform:translate(-50%,0);
+    opacity:1;
+}
+
+/* FOOTER */
+footer{
+    text-align:center;
+    margin-top:45px;
+    color:#68738e;
+    font-size:11px;
+}
+
+footer strong{
+    color:#aeb8d0;
+}
+
+/* RESPONSIVE */
+@media(max-width:850px){
+
+    .palette{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .color-card{
+        min-height:300px;
+    }
+
+    .color-card:last-child{
+        grid-column:span 2;
+    }
+}
+
+@media(max-width:560px){
+
+    .app{
+        width:92%;
+        padding-top:18px;
+    }
+
+    header{
+        margin-bottom:25px;
+    }
+
+    .brand h1{
+        font-size:17px;
+    }
+
+    .header-badge{
+        display:none;
+    }
+
+    .palette{
+        grid-template-columns:1fr 1fr;
+        gap:9px;
+    }
+
+    .color-card{
+        min-height:260px;
+        border-radius:18px;
+    }
+
+    .color-card:last-child{
+        grid-column:span 2;
+    }
+
+    .color-content{
+        padding:11px;
+        left:8px;
+        right:8px;
+        bottom:8px;
+    }
+
+    .hex{
+        font-size:15px;
+    }
+
+    .small-btn{
+        font-size:10px;
+        padding:8px 3px;
+    }
+
+    .main-btn{
+        width:100%;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    *,
+    *::before,
+    *::after{
+        animation-duration:.01ms !important;
+        transition:none !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header>
+
+        <div class="brand">
+            <div class="logo">🎨</div>
+
+            <div>
+                <h1>ANAND Color Lab</h1>
+                <span>GENERATE • COPY • CREATE</span>
+            </div>
+        </div>
+
+        <div class="header-badge">
+            HTML • CSS • JAVASCRIPT
+        </div>
+
+    </header>
+
+
+    <section class="hero">
+
+        <h2>Color Palette Generator</h2>
+
+        <p>
+            Generate beautiful color palettes instantly.
+            Lock your favorite colors, copy HEX codes,
+            and create your next design palette.
+        </p>
+
+    </section>
+
+
+    <section
+        class="palette"
+        id="palette">
+    </section>
+
+
+    <div class="controls">
+
+        <button
+            class="main-btn"
+            id="generateBtn">
+            🎨 Generate Palette
+        </button>
+
+        <button
+            class="main-btn secondary-btn"
+            id="copyAllBtn">
+            📋 Copy All
+        </button>
+
+    </div>
+
+
+    <p class="tip">
+        💡 Tip:
+        Click <strong>Lock</strong> to keep a color
+        while generating new palettes.
+    </p>
+
+
+    <footer>
+        Built with
+        <strong>HTML • CSS • JavaScript</strong>
+        by
+        <strong>ANAND CODE LAB</strong>
+        🚀
+    </footer>
+
+</div>
+
+
+<div
+    class="toast"
+    id="toast">
+    Copied!
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const palette =
+        document.getElementById("palette");
+
+    const generateBtn =
+        document.getElementById("generateBtn");
+
+    const copyAllBtn =
+        document.getElementById("copyAllBtn");
+
+    const toast =
+        document.getElementById("toast");
+
+
+    const STORAGE_KEY =
+        "anand_color_palette";
+
+
+    let colors = [];
+
+    let locked = [
+        false,
+        false,
+        false,
+        false,
+        false
+    ];
+
+
+    /*
+    ==========================================
+    RANDOM COLOR
+    ==========================================
+    */
+
+    function randomColor(){
+
+        const characters =
+            "0123456789ABCDEF";
+
+        let color = "#";
+
+        for(let i = 0; i < 6; i++){
+
+            color += characters[
+                Math.floor(
+                    Math.random() *
+                    characters.length
+                )
+            ];
+
+        }
+
+        return color;
+
+    }
+
+
+    /*
+    ==========================================
+    SHOW TOAST
+    ==========================================
+    */
+
+    function showToast(message){
+
+        toast.textContent = message;
+
+        toast.classList.add("show");
+
+        setTimeout(() => {
+
+            toast.classList.remove("show");
+
+        }, 1500);
+
+    }
+
+
+    /*
+    ==========================================
+    SAVE PALETTE
+    ==========================================
+    */
+
+    function savePalette(){
+
+        try{
+
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify({
+                    colors,
+                    locked
+                })
+            );
+
+        }catch(error){
+
+            console.log(
+                "Could not save palette",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+    ==========================================
+    LOAD PALETTE
+    ==========================================
+    */
+
+    function loadPalette(){
+
+        try{
+
+            const saved =
+                localStorage.getItem(
+                    STORAGE_KEY
+                );
+
+            if(saved){
+
+                const data =
+                    JSON.parse(saved);
+
+                if(
+                    Array.isArray(data.colors) &&
+                    data.colors.length === 5
+                ){
+
+                    colors = data.colors;
+
+                    if(
+                        Array.isArray(data.locked) &&
+                        data.locked.length === 5
+                    ){
+
+                        locked = data.locked;
+
+                    }
+
+                    renderPalette();
+
+                    return;
+
+                }
+
+            }
+
+        }catch(error){
+
+            console.log(
+                "Could not load palette",
+                error
+            );
+
+        }
+
+        generatePalette();
+
+    }
+
+
+    /*
+    ==========================================
+    GENERATE PALETTE
+    ==========================================
+    */
+
+    function generatePalette(){
+
+        colors = colors.length === 5
+            ? colors
+            : new Array(5).fill("#000000");
+
+
+        for(let i = 0; i < 5; i++){
+
+            if(!locked[i]){
+
+                colors[i] =
+                    randomColor();
+
+            }
+
+        }
+
+        renderPalette();
+
+        savePalette();
+
+    }
+
+
+    /*
+    ==========================================
+    RENDER PALETTE
+    ==========================================
+    */
+
+    function renderPalette(){
+
+        palette.innerHTML = "";
+
+        colors.forEach((color,index) => {
+
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "color-card" +
+                (locked[index]
+                    ? " locked"
+                    : "");
+
+
+            card.innerHTML = `
+
+                <div
+                    class="color-preview"
+                    style="background:${color}">
+                </div>
+
+                <div class="lock-badge">
+                    ${locked[index] ? "🔒" : "🔓"}
+                </div>
+
+                <div class="color-content">
+
+                    <div class="color-number">
+                        COLOR ${index + 1}
+                    </div>
+
+                    <span class="hex">
+                        ${color}
+                    </span>
+
+                    <div class="card-actions">
+
+                        <button
+                            class="small-btn copy-btn"
+                            data-color="${color}">
+                            📋 Copy
+                        </button>
+
+                        <button
+                            class="small-btn lock-btn"
+                            data-index="${index}">
+                            ${locked[index]
+                                ? "🔓 Unlock"
+                                : "🔒 Lock"}
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+
+            /*
+            COPY BUTTON
+            */
+
+            const copyBtn =
+                card.querySelector(".copy-btn");
+
+            copyBtn.addEventListener(
+                "click",
+                async () => {
+
+                    await copyText(
+                        color
+                    );
+
+                    showToast(
+                        `${color} copied!`
+                    );
+
+                }
+            );
+
+
+            /*
+            LOCK BUTTON
+            */
+
+            const lockBtn =
+                card.querySelector(".lock-btn");
+
+            lockBtn.addEventListener(
+                "click",
+                () => {
+
+                    locked[index] =
+                        !locked[index];
+
+                    renderPalette();
+
+                    savePalette();
+
+                    showToast(
+                        locked[index]
+                            ? "Color locked 🔒"
+                            : "Color unlocked 🔓"
+                    );
+
+                }
+            );
+
+
+            palette.appendChild(card);
+
+        });
+
+    }
+
+
+    /*
+    ==========================================
+    COPY TEXT
+    ==========================================
+    */
+
+    async function copyText(text){
+
+        try{
+
+            if(
+                navigator.clipboard &&
+                window.isSecureContext
+            ){
+
+                await navigator.clipboard.writeText(
+                    text
+                );
+
+                return true;
+
+            }
+
+            /*
+            Fallback for environments where
+            Clipboard API isn't available.
+            */
+
+            const textarea =
+                document.createElement("textarea");
+
+            textarea.value = text;
+
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+
+            document.body.appendChild(
+                textarea
+            );
+
+            textarea.select();
+
+            const success =
+                document.execCommand("copy");
+
+            textarea.remove();
+
+            return success;
+
+        }catch(error){
+
+            console.error(
+                "Copy failed:",
+                error
+            );
+
+            return false;
+
+        }
+
+    }
+
+
+    /*
+    ==========================================
+    COPY ALL COLORS
+    ==========================================
+    */
+
+    copyAllBtn.addEventListener(
+        "click",
+        async () => {
+
+            const text =
+                colors.join("\n");
+
+            const success =
+                await copyText(text);
+
+            showToast(
+                success
+                    ? "All colors copied! 🎨"
+                    : "Copy failed"
+            );
+
+        }
+    );
+
+
+    /*
+    ==========================================
+    GENERATE BUTTON
+    ==========================================
+    */
+
+    generateBtn.addEventListener(
+        "click",
+        () => {
+
+            generatePalette();
+
+            showToast(
+                "New palette generated! ✨"
+            );
+
+        }
+    );
+
+
+    /*
+    ==========================================
+    KEYBOARD SHORTCUT
+    ==========================================
+    */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if(
+                event.code === "Space" &&
+                document.activeElement.tagName !== "BUTTON"
+            ){
+
+                event.preventDefault();
+
+                generatePalette();
+
+                showToast(
+                    "New palette generated! ✨"
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+    ==========================================
+    START APP
+    ==========================================
+    */
+
+    loadPalette();
+
+});
+</script>
+
+</body>
+</html>
